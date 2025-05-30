@@ -124,15 +124,11 @@ export const MatrixWorkspace: React.FC<MatrixWorkspaceProps> = ({
                         <div className="bg-content2 p-4 rounded-md">
                             <div className="text-center">
                                 <LatexExpression
-                                    expression={`\\begin{align} ${currentStepData.calculation
+                                    expression={`${currentStepData.calculation
                                         .replace(/×/g, ' \\cdot ')
-                                        .replace(/\+/g, ' + ')
-                                        .replace(
-                                            /(\d+)\s*\cdot\s*(\d+)/g,
-                                            '$1 \\cdot $2'
-                                        )} &= ${
+                                        .replace(/\+/g, ' + ')} = ${
                                         currentStepData.value
-                                    } \\end{align}`}
+                                    }`}
                                     inline={false}
                                     className={
                                         highlightMode

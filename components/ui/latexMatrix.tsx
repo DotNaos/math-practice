@@ -23,14 +23,14 @@ export const LatexMatrix: React.FC<LatexMatrixProps> = ({
     className = '',
 }) => {
     const generateMatrixLatex = () => {
-        // Create matrix content
+        // Create matrix content with simple color highlighting
         const rows = matrix
             .map((row, rowIndex) => {
                 return row
                     .map((cell, colIndex) => {
                         let cellValue = String(cell);
 
-                        // Apply highlighting using KaTeX-supported color commands
+                        // Apply highlighting using simple KaTeX color commands
                         const isHighlightedRow =
                             highlightRow !== undefined &&
                             rowIndex === highlightRow;
@@ -45,11 +45,11 @@ export const LatexMatrix: React.FC<LatexMatrixProps> = ({
                             (c) => c.row === rowIndex && c.col === colIndex
                         );
 
-                        // Use KaTeX color commands for highlighting
+                        // Apply highlighting with supported KaTeX commands
                         if (isCurrentCell) {
-                            cellValue = `\\color{orange}{\\boxed{${cellValue}}}`;
+                            cellValue = `\\boxed{\\color{orange}{${cellValue}}}`;
                         } else if (isRevealed) {
-                            cellValue = `\\color{green}{\\mathbf{${cellValue}}}`;
+                            cellValue = `\\mathbf{\\color{green}{${cellValue}}}`;
                         } else if (isHighlightedRow || isHighlightedCol) {
                             cellValue = `\\color{blue}{${cellValue}}`;
                         }
