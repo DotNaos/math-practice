@@ -30,7 +30,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {
             id: 'powers-roots',
             label: 'Powers & Roots',
-            icon: 'lucide:square-root',
+            icon: 'lucide:radical',
         },
         { id: 'settings', label: 'Settings', icon: 'lucide:settings' },
     ];
