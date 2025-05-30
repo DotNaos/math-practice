@@ -31,7 +31,7 @@ available_tools = {
 def do_stream(messages: List[ChatCompletionMessageParam]):
     stream = client.chat.completions.create(
         messages=messages,
-        model="gpt-4o",
+        model="gpt-4o-mini",
         stream=True,
         tools=[{
             "type": "function",
