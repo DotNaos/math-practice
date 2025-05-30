@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
+@import "katex/dist/katex.min.css";
 
 :root {
     --foreground-rgb: 0, 0, 0;
@@ -118,4 +119,35 @@
 
 .matrix-table tr:last-child td {
     border-bottom: 2px solid hsl(var(--border));
+}
+
+/* LaTeX Matrix Styles */
+.latex-matrix-container {
+    @apply flex items-center justify-center;
+}
+
+.latex-matrix-container .katex {
+    font-size: 1.2em !important;
+}
+
+.latex-matrix-container .katex-display {
+    margin: 0 !important;
+}
+
+/* Matrix highlighting styles for LaTeX */
+.matrix-highlight-row {
+    background-color: rgba(var(--primary), 0.1) !important;
+}
+
+.matrix-highlight-col {
+    background-color: rgba(var(--primary), 0.1) !important;
+}
+
+.matrix-highlight-current {
+    background-color: rgba(var(--warning), 0.2) !important;
+    border: 2px solid rgba(var(--warning), 0.5) !important;
+}
+
+.matrix-highlight-revealed {
+    background-color: rgba(var(--success), 0.1) !important;
 }

@@ -28,11 +28,13 @@
     "eslint": "9.27.0",
     "eslint-config-next": "15.3.3",
     "framer-motion": "^12.15.0",
+    "katex": "^0.16.22",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "postcss": "8.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-katex": "^3.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.3",
@@ -46,7 +48,8 @@
   },
   "packageManager": "pnpm@10.8.1+sha512.c50088ba998c67b8ca8c99df8a5e02fd2ae2e2b29aaf238feaa9e124248d3f48f9fb6db2424949ff901cffbb5e0f0cc1ad6aedb602cd29450751d11c35023677",
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.8"
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/katex": "^0.16.7"
   },
   "type": "module"
 }

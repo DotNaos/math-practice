@@ -2,6 +2,7 @@
 
 import { Divider } from '@heroui/react';
 import React from 'react';
+import { LatexExpression, LatexMatrix } from '../ui/latexMatrix';
 
 interface MatrixProblem {
     matrixA: number[][];
@@ -54,120 +55,62 @@ export const MatrixWorkspace: React.FC<MatrixWorkspaceProps> = ({
         })
     );
 
+    // Calculate revealed cells for highlighting
+    const revealedCells = steps.slice(0, currentStep).map((step) => ({
+        row: step.row,
+        col: step.col,
+    }));
+
     return (
         <div className="space-y-6">
             <div className="text-center text-lg font-medium">
                 Multiply the following matrices
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                 {/* Matrix A */}
-                <div className="flex flex-col items-center">
-                    <div className="text-sm text-default-600 mb-1">
-                        Matrix A
-                    </div>
-                    <div className="border border-default-200 rounded-md p-2 bg-content2">
-                        <table className="matrix-table">
-                            <tbody>
-                                {matrixA.map((row, rowIndex) => (
-                                    <tr key={`a-row-${rowIndex}`}>
-                                        {row.map((cell, colIndex) => (
-                                            <td
-                                                key={`a-cell-${rowIndex}-${colIndex}`}
-                                                className={`p-2 text-center min-w-[40px] ${
-                                                    highlightMode &&
-                                                    currentStepData &&
-                                                    currentStepData.row ===
-                                                        rowIndex
-                                                        ? 'bg-primary-100'
-                                                        : ''
-                                                }`}
-                                            >
-                                                {cell}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <LatexMatrix
+                    matrix={matrixA}
+                    label="Matrix A"
+                    highlightRow={
+                        highlightMode && currentStepData
+                            ? currentStepData.row
+                            : undefined
+                    }
+                    className="flex-shrink-0"
+                />
 
-                <div className="text-2xl font-bold">×</div>
+                <div className="text-3xl font-bold">×</div>
 
                 {/* Matrix B */}
-                <div className="flex flex-col items-center">
-                    <div className="text-sm text-default-600 mb-1">
-                        Matrix B
-                    </div>
-                    <div className="border border-default-200 rounded-md p-2 bg-content2">
-                        <table className="matrix-table">
-                            <tbody>
-                                {matrixB.map((row, rowIndex) => (
-                                    <tr key={`b-row-${rowIndex}`}>
-                                        {row.map((cell, colIndex) => (
-                                            <td
-                                                key={`b-cell-${rowIndex}-${colIndex}`}
-                                                className={`p-2 text-center min-w-[40px] ${
-                                                    highlightMode &&
-                                                    currentStepData &&
-                                                    currentStepData.col ===
-                                                        colIndex
-                                                        ? 'bg-primary-100'
-                                                        : ''
-                                                }`}
-                                            >
-                                                {cell}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <LatexMatrix
+                    matrix={matrixB}
+                    label="Matrix B"
+                    highlightCol={
+                        highlightMode && currentStepData
+                            ? currentStepData.col
+                            : undefined
+                    }
+                    className="flex-shrink-0"
+                />
 
-                <div className="text-2xl font-bold">=</div>
+                <div className="text-3xl font-bold">=</div>
 
                 {/* Result Matrix */}
-                <div className="flex flex-col items-center">
-                    <div className="text-sm text-default-600 mb-1">Result</div>
-                    <div className="border border-default-200 rounded-md p-2 bg-content2">
-                        <table className="matrix-table">
-                            <tbody>
-                                {displayResult.map((row, rowIndex) => (
-                                    <tr key={`result-row-${rowIndex}`}>
-                                        {row.map((cell, colIndex) => {
-                                            const isRevealed =
-                                                typeof cell === 'number';
-                                            const isCurrentTarget =
-                                                currentStepData &&
-                                                currentStepData.row ===
-                                                    rowIndex &&
-                                                currentStepData.col ===
-                                                    colIndex;
-
-                                            return (
-                                                <td
-                                                    key={`result-cell-${rowIndex}-${colIndex}`}
-                                                    className={`p-2 text-center min-w-[40px] ${
-                                                        isCurrentTarget
-                                                            ? 'bg-warning-100 border-2 border-warning-300'
-                                                            : isRevealed
-                                                            ? 'bg-success-100'
-                                                            : 'bg-default-100'
-                                                    }`}
-                                                >
-                                                    {cell}
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <LatexMatrix
+                    matrix={displayResult}
+                    label="Result"
+                    revealedCells={revealedCells}
+                    currentCell={
+                        currentStepData
+                            ? {
+                                  row: currentStepData.row,
+                                  col: currentStepData.col,
+                              }
+                            : undefined
+                    }
+                    className="flex-shrink-0"
+                />
             </div>
 
             {currentStepData && (
@@ -179,21 +122,25 @@ export const MatrixWorkspace: React.FC<MatrixWorkspaceProps> = ({
                             Current Step Calculation
                         </h3>
                         <div className="bg-content2 p-4 rounded-md">
-                            <p className="text-center font-mono">
-                                <span
+                            <div className="text-center">
+                                <LatexExpression
+                                    expression={`\\begin{align} ${currentStepData.calculation
+                                        .replace(/×/g, ' \\cdot ')
+                                        .replace(/\+/g, ' + ')
+                                        .replace(
+                                            /(\d+)\s*\cdot\s*(\d+)/g,
+                                            '$1 \\cdot $2'
+                                        )} &= ${
+                                        currentStepData.value
+                                    } \\end{align}`}
+                                    inline={false}
                                     className={
                                         highlightMode
-                                            ? 'bg-primary-100 px-1 rounded'
+                                            ? 'bg-primary-50 px-2 py-1 rounded'
                                             : ''
                                     }
-                                >
-                                    {currentStepData.calculation}
-                                </span>
-                                <span className="mx-2">=</span>
-                                <span className="font-medium text-success">
-                                    {currentStepData.value}
-                                </span>
-                            </p>
+                                />
+                            </div>
                         </div>
                     </div>
                 </>
