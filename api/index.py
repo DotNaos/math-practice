@@ -1,15 +1,16 @@
-import os
 import json
+import os
 from typing import List
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-from pydantic import BaseModel
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse
 from openai import OpenAI
-from .utils.prompt import ClientMessage, convert_to_openai_messages
-from .utils.tools import get_current_weather
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from pydantic import BaseModel
 
+from api.utils.prompt import ClientMessage, convert_to_openai_messages
+from api.utils.tools import get_current_weather
 
 load_dotenv(".env.local")
 
@@ -114,8 +115,10 @@ def stream_text(messages: List[ChatCompletionMessageParam], protocol: str = 'dat
             elif choice.delta.tool_calls:
                 for tool_call in choice.delta.tool_calls:
                     id = tool_call.id
-                    name = tool_call.function.name
-                    arguments = tool_call.function.arguments
+                    name = tool_call.function.name if tool_call.function else None
+                    arguments = (
+                        tool_call.function.arguments if tool_call.function else None
+                    )
 
                     if (id is not None):
                         draft_tool_calls_index += 1
@@ -123,22 +126,25 @@ def stream_text(messages: List[ChatCompletionMessageParam], protocol: str = 'dat
                             {"id": id, "name": name, "arguments": ""})
 
                     else:
-                        draft_tool_calls[draft_tool_calls_index]["arguments"] += arguments
+                        if arguments:
+                            draft_tool_calls[draft_tool_calls_index]["arguments"] += (
+                                arguments
+                            )
 
             else:
                 yield '0:{text}\n'.format(text=json.dumps(choice.delta.content))
 
         if chunk.choices == []:
             usage = chunk.usage
-            prompt_tokens = usage.prompt_tokens
-            completion_tokens = usage.completion_tokens
+            if usage:
+                prompt_tokens = usage.prompt_tokens
+                completion_tokens = usage.completion_tokens
 
-            yield 'e:{{"finishReason":"{reason}","usage":{{"promptTokens":{prompt},"completionTokens":{completion}}},"isContinued":false}}\n'.format(
-                reason="tool-calls" if len(
-                    draft_tool_calls) > 0 else "stop",
-                prompt=prompt_tokens,
-                completion=completion_tokens
-            )
+                yield 'e:{{"finishReason":"{reason}","usage":{{"promptTokens":{prompt},"completionTokens":{completion}}},"isContinued":false}}\n'.format(
+                    reason="tool-calls" if len(draft_tool_calls) > 0 else "stop",
+                    prompt=prompt_tokens,
+                    completion=completion_tokens,
+                )
 
 
 
