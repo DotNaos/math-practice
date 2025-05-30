@@ -18,6 +18,14 @@ export const SettingsModule: React.FC = () => {
     const [animations, setAnimations] = React.useState(true);
     const [theme, setTheme] = React.useState('dark');
 
+    const handleDifficultyChange = (value: number | number[]) => {
+        if (Array.isArray(value)) {
+            setDifficulty(value);
+        } else {
+            setDifficulty([value]);
+        }
+    };
+
     return (
         <WorkspaceCard
             title="Settings"
@@ -92,7 +100,7 @@ export const SettingsModule: React.FC = () => {
                                 minValue={10}
                                 maxValue={100}
                                 value={difficulty}
-                                onChange={setDifficulty}
+                                onChange={handleDifficultyChange}
                                 className="max-w-md"
                             />
                             <p className="text-sm text-default-500 mt-1">
