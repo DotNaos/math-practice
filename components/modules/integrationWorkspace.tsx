@@ -25,7 +25,7 @@ export const IntegrationWorkspace: React.FC<IntegrationWorkspaceProps> = ({
                         No integration problem loaded
                     </p>
                     <p className="text-default-400">
-                        Click "Generate" to create a new problem
+                        Click &ldquo;Generate&rdquo; to create a new problem
                     </p>
                 </div>
             </div>
