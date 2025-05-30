@@ -39,3 +39,107 @@ To learn more about the AI SDK or Next.js by Vercel, take a look at the followin
 
 - [AI SDK Documentation](https://sdk.vercel.ai/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
+
+# Math Practice Suite
+
+An interactive mathematics training platform for matrices, calculus, and algebraic operations with step-by-step solutions.
+
+## Features
+
+- **Matrix Multiplication Trainer**: Practice matrix multiplication with step-by-step guidance
+- **Interactive UI**: Modern, responsive interface built with Next.js and HeroUI
+- **Step-by-step Solutions**: Learn by following detailed calculation steps
+- **Highlight Mode**: Visual highlighting of relevant matrix rows/columns
+- **Progress Tracking**: Track your progress through each problem
+
+## Tech Stack
+
+- **Frontend**: Next.js 13, React, TypeScript, HeroUI, Tailwind CSS
+- **Backend**: FastAPI, Python, NumPy
+- **Development**: pnpm, uv (Python package manager)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Python 3.12+ and uv
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd math-practice
+```
+
+2. Install frontend dependencies:
+```bash
+pnpm install
+```
+
+3. Install backend dependencies:
+```bash
+uv sync
+```
+
+### Development
+
+Start the development server (runs both frontend and backend):
+
+```bash
+pnpm dev
+```
+
+This will start:
+- Next.js frontend on http://localhost:3000
+- FastAPI backend on http://localhost:8000
+
+### API Documentation
+
+When running in development mode, you can access the FastAPI documentation at:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## Project Structure
+
+```
+├── app/                    # Next.js app directory
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Main page
+│   └── globals.css        # Global styles
+├── components/            # React components
+│   ├── modules/          # Module-specific components
+│   ├── main-layout.tsx   # Main layout component
+│   └── workspace-card.tsx # Shared workspace component
+├── api/                   # FastAPI backend
+│   ├── math/             # Math problem generators
+│   └── index.py          # Main API file
+└── lib/                   # Utility functions
+```
+
+## Modules
+
+### Matrix Multiplication
+- Generate random matrix multiplication problems
+- Step-by-step calculation display
+- Interactive highlighting of relevant rows/columns
+- Progress tracking through solution steps
+
+### Coming Soon
+- **Differentiation**: Symbolic differentiation with step-by-step solutions
+- **Integration**: Symbolic integration practice
+- **Simplification**: Algebraic expression simplification
+- **Powers & Roots**: Power and root calculations
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

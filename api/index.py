@@ -1,159 +1,74 @@
-import json
-import os
 from typing import List
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Query
-from fastapi.responses import StreamingResponse
-from openai import OpenAI
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from api.utils.prompt import ClientMessage, convert_to_openai_messages
-from api.utils.tools import get_current_weather
+from api.math.matrices import generate_matrix_problem, validate_matrix_step
 
 load_dotenv(".env.local")
 
-app = FastAPI()
+app = FastAPI(
+    title="Math Practice API",
+    description="API for generating and validating math practice problems",
+    version="1.0.0",
+)
 
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
-class Request(BaseModel):
-    messages: List[ClientMessage]
+class MatrixValidationRequest(BaseModel):
+    matrixA: List[List[int]]
+    matrixB: List[List[int]]
+    row: int
+    col: int
+    userAnswer: int
 
 
-available_tools = {
-    "get_current_weather": get_current_weather,
-}
-
-def do_stream(messages: List[ChatCompletionMessageParam]):
-    stream = client.chat.completions.create(
-        messages=messages,
-        model="gpt-4o-mini",
-        stream=True,
-        tools=[{
-            "type": "function",
-            "function": {
-                "name": "get_current_weather",
-                "description": "Get the current weather at a location",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "latitude": {
-                            "type": "number",
-                            "description": "The latitude of the location",
-                        },
-                        "longitude": {
-                            "type": "number",
-                            "description": "The longitude of the location",
-                        },
-                    },
-                    "required": ["latitude", "longitude"],
-                },
-            },
-        }]
-    )
-
-    return stream
-
-def stream_text(messages: List[ChatCompletionMessageParam], protocol: str = 'data'):
-    draft_tool_calls = []
-    draft_tool_calls_index = -1
-
-    stream = client.chat.completions.create(
-        messages=messages,
-        model="gpt-4o",
-        stream=True,
-        tools=[{
-            "type": "function",
-            "function": {
-                "name": "get_current_weather",
-                "description": "Get the current weather at a location",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "latitude": {
-                            "type": "number",
-                            "description": "The latitude of the location",
-                        },
-                        "longitude": {
-                            "type": "number",
-                            "description": "The longitude of the location",
-                        },
-                    },
-                    "required": ["latitude", "longitude"],
-                },
-            },
-        }]
-    )
-
-    for chunk in stream:
-        for choice in chunk.choices:
-            if choice.finish_reason == "stop":
-                continue
-
-            elif choice.finish_reason == "tool_calls":
-                for tool_call in draft_tool_calls:
-                    yield '9:{{"toolCallId":"{id}","toolName":"{name}","args":{args}}}\n'.format(
-                        id=tool_call["id"],
-                        name=tool_call["name"],
-                        args=tool_call["arguments"])
-
-                for tool_call in draft_tool_calls:
-                    tool_result = available_tools[tool_call["name"]](
-                        **json.loads(tool_call["arguments"]))
-
-                    yield 'a:{{"toolCallId":"{id}","toolName":"{name}","args":{args},"result":{result}}}\n'.format(
-                        id=tool_call["id"],
-                        name=tool_call["name"],
-                        args=tool_call["arguments"],
-                        result=json.dumps(tool_result))
-
-            elif choice.delta.tool_calls:
-                for tool_call in choice.delta.tool_calls:
-                    id = tool_call.id
-                    name = tool_call.function.name if tool_call.function else None
-                    arguments = (
-                        tool_call.function.arguments if tool_call.function else None
-                    )
-
-                    if (id is not None):
-                        draft_tool_calls_index += 1
-                        draft_tool_calls.append(
-                            {"id": id, "name": name, "arguments": ""})
-
-                    else:
-                        if arguments:
-                            draft_tool_calls[draft_tool_calls_index]["arguments"] += (
-                                arguments
-                            )
-
-            else:
-                yield '0:{text}\n'.format(text=json.dumps(choice.delta.content))
-
-        if chunk.choices == []:
-            usage = chunk.usage
-            if usage:
-                prompt_tokens = usage.prompt_tokens
-                completion_tokens = usage.completion_tokens
-
-                yield 'e:{{"finishReason":"{reason}","usage":{{"promptTokens":{prompt},"completionTokens":{completion}}},"isContinued":false}}\n'.format(
-                    reason="tool-calls" if len(draft_tool_calls) > 0 else "stop",
-                    prompt=prompt_tokens,
-                    completion=completion_tokens,
-                )
+@app.get("/")
+async def root():
+    return {"message": "Math Practice API", "version": "1.0.0"}
 
 
+@app.post("/api/math/matrices/generate")
+async def generate_matrix():
+    """Generate a new matrix multiplication problem."""
+    try:
+        problem = generate_matrix_problem()
+        return problem
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate matrix problem: {str(e)}"
+        )
 
 
-@app.post("/api/chat")
-async def handle_chat_data(request: Request, protocol: str = Query('data')):
-    messages = request.messages
-    openai_messages = convert_to_openai_messages(messages)
+@app.post("/api/math/matrices/validate")
+async def validate_matrix(request: MatrixValidationRequest):
+    """Validate a user's answer for a matrix multiplication step."""
+    try:
+        result = validate_matrix_step(
+            request.matrixA,
+            request.matrixB,
+            request.row,
+            request.col,
+            request.userAnswer,
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to validate answer: {str(e)}"
+        )
 
-    response = StreamingResponse(stream_text(openai_messages, protocol))
-    response.headers['x-vercel-ai-data-stream'] = 'v1'
-    return response
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "math-practice-api"}
