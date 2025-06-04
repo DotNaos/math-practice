@@ -7,6 +7,7 @@ import { MatricesModule } from '@/components/modules/matrices-module';
 import { PowersRootsModule } from '@/components/modules/powers-roots-module';
 import { SettingsModule } from '@/components/modules/settings-module';
 import { SimplificationModule } from '@/components/modules/simplification-module';
+import { MODULES, ModuleType } from '@/types/modules';
 import {
     Button,
     Dropdown,
@@ -20,14 +21,6 @@ import {
 import { Icon } from '@iconify/react';
 import React from 'react';
 
-export type ModuleType =
-    | 'matrices'
-    | 'differentiation'
-    | 'integration'
-    | 'simplification'
-    | 'powers-roots'
-    | 'settings';
-
 export default function Page() {
     const [activeModule, setActiveModule] =
         React.useState<ModuleType>('matrices');
@@ -38,31 +31,18 @@ export default function Page() {
     };
 
     const renderModule = () => {
-        switch (activeModule) {
-            case 'matrices':
-                return <MatricesModule />;
-            case 'differentiation':
-                return <DifferentiationModule />;
-            case 'integration':
-                return <IntegrationModule />;
-            case 'simplification':
-                return <SimplificationModule />;
-            case 'powers-roots':
-                return <PowersRootsModule />;
-            case 'settings':
-                return <SettingsModule />;
-            default:
-                return <MatricesModule />;
-        }
+        const components: Record<ModuleType, React.ReactNode> = {
+            matrices: <MatricesModule />,
+            differentiation: <DifferentiationModule />,
+            integration: <IntegrationModule />,
+            simplification: <SimplificationModule />,
+            'powers-roots': <PowersRootsModule />,
+            settings: <SettingsModule />,
+        };
+        return components[activeModule] || <MatricesModule />;
     };
 
-    const moduleOptions = [
-        { key: 'matrices', label: 'Matrices' },
-        { key: 'differentiation', label: 'Differentiation' },
-        { key: 'integration', label: 'Integration' },
-        { key: 'simplification', label: 'Simplification' },
-        { key: 'powers-roots', label: 'Powers & Roots' },
-    ];
+    const moduleOptions = MODULES;
 
     return (
         <div className="flex flex-col h-dvh bg-background">

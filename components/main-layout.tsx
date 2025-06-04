@@ -1,4 +1,4 @@
-import { ModuleType } from '@/app/page';
+import { MODULES, ModuleType } from '@/types/modules';
 import { Button, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import React from 'react';
@@ -18,22 +18,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     activeModule,
     setActiveModule,
 }) => {
-    const modules = [
-        { id: 'matrices', label: 'Matrices', icon: 'lucide:grid' },
-        {
-            id: 'differentiation',
-            label: 'Differentiation',
-            icon: 'lucide:function-square',
-        },
-        { id: 'integration', label: 'Integration', icon: 'lucide:sigma' },
-        { id: 'simplification', label: 'Simplification', icon: 'lucide:equal' },
-        {
-            id: 'powers-roots',
-            label: 'Powers & Roots',
-            icon: 'lucide:radical',
-        },
-        { id: 'settings', label: 'Settings', icon: 'lucide:settings' },
-    ];
+    const modules = MODULES;
 
     return (
         <div className="flex flex-1 overflow-hidden">
