@@ -62,7 +62,7 @@ export const MatrixWorkspace: React.FC<MatrixWorkspaceProps> = ({
     }));
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 min-h-96">
             <div className="text-center text-lg font-medium">
                 Multiply the following matrices
             </div>

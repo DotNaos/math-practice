@@ -11,6 +11,14 @@ from api.math.differentiation import (
 )
 from api.math.integration import generate_integration_problem, validate_integration_step
 from api.math.matrices import generate_matrix_problem, validate_matrix_step
+from api.math.simplification import (
+    generate_simplification_problem,
+    validate_simplification_step,
+)
+from api.math.powers_roots import (
+    generate_powers_roots_problem,
+    validate_powers_roots_step,
+)
 
 load_dotenv(".env.local")
 
@@ -47,6 +55,18 @@ class DifferentiationValidationRequest(BaseModel):
 class IntegrationValidationRequest(BaseModel):
     functionStr: str
     userIntegral: str
+    stepNumber: int
+
+
+class SimplificationValidationRequest(BaseModel):
+    expressionStr: str
+    userAnswer: str
+    stepNumber: int
+
+
+class PowersRootsValidationRequest(BaseModel):
+    expressionStr: str
+    userAnswer: str
     stepNumber: int
 
 
@@ -133,6 +153,64 @@ async def validate_integration(request: IntegrationValidationRequest):
         result = validate_integration_step(
             request.functionStr,
             request.userIntegral,
+            request.stepNumber,
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to validate answer: {str(e)}"
+        )
+
+
+@app.post("/api/math/simplification/generate")
+async def generate_simplification():
+    """Generate a new simplification problem."""
+    try:
+        problem = generate_simplification_problem()
+        return problem
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate simplification problem: {str(e)}",
+        )
+
+
+@app.post("/api/math/simplification/validate")
+async def validate_simplification(request: SimplificationValidationRequest):
+    """Validate a user's answer for a simplification step."""
+    try:
+        result = validate_simplification_step(
+            request.expressionStr,
+            request.userAnswer,
+            request.stepNumber,
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to validate answer: {str(e)}"
+        )
+
+
+@app.post("/api/math/powers-roots/generate")
+async def generate_powers_roots():
+    """Generate a new powers & roots problem."""
+    try:
+        problem = generate_powers_roots_problem()
+        return problem
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate powers/roots problem: {str(e)}",
+        )
+
+
+@app.post("/api/math/powers-roots/validate")
+async def validate_powers_roots(request: PowersRootsValidationRequest):
+    """Validate a user's answer for a powers & roots step."""
+    try:
+        result = validate_powers_roots_step(
+            request.expressionStr,
+            request.userAnswer,
             request.stepNumber,
         )
         return result

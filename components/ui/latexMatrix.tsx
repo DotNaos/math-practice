@@ -49,9 +49,13 @@ export const LatexMatrix: React.FC<LatexMatrixProps> = ({
                         if (isCurrentCell) {
                             cellValue = `\\boxed{\\color{orange}{${cellValue}}}`;
                         } else if (isRevealed) {
-                            cellValue = `\\mathbf{\\color{green}{${cellValue}}}`;
-                        } else if (isHighlightedRow || isHighlightedCol) {
-                            cellValue = `\\color{blue}{${cellValue}}`;
+                            cellValue = `\\mathbf{\\color{#16a34a}{${cellValue}}}`;
+                        } else if (isHighlightedRow && isHighlightedCol) {
+                            cellValue = `\\color{#eab308}{${cellValue}}`;
+                        } else if (isHighlightedRow) {
+                            cellValue = `\\color{#06b6d4}{${cellValue}}`;
+                        } else if (isHighlightedCol) {
+                            cellValue = `\\color{#a855f7}{${cellValue}}`;
                         }
 
                         return cellValue;
