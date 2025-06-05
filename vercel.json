@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/**": {
+      "runtime": "python3.12",
       "excludeFiles": "{.next,.git,node_modules}/**"
     }
   }

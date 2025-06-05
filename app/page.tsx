@@ -82,7 +82,7 @@ export default function Page() {
                                 }
                             >
                                 {moduleOptions.find(
-                                    (m) => m.key === activeModule
+                                    (m) => m.id === activeModule
                                 )?.label || 'Select Module'}
                             </Button>
                         </DropdownTrigger>
@@ -95,7 +95,7 @@ export default function Page() {
                             selectionMode="single"
                         >
                             {moduleOptions.map((option) => (
-                                <DropdownItem key={option.key}>
+                                <DropdownItem key={option.id}>
                                     {option.label}
                                 </DropdownItem>
                             ))}
