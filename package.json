@@ -50,7 +50,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
     "@types/katex": "^0.16.7",
-    "@types/react-katex": "^3.0.4"
+    "@types/react-katex": "^3.0.4",
+    "autoprefixer": "^10.4.21"
   },
   "type": "module"
 }
